@@ -32,7 +32,6 @@ let store = JSON.parse(localStorage.getItem("autoexotic_store") || "null") || {
   nextEmpId: 1,
 };
 
-// Migrations
 if (!store.sessions) store.sessions = [];
 if (!store.depenses) store.depenses = [];
 if (!store.gradePct) store.gradePct = { ...DEFAULT_GRADE_PCT };
