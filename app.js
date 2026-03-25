@@ -23,7 +23,10 @@ function getGradePct(role) {
 }
 
 let store = JSON.parse(localStorage.getItem("autoexotic_store") || "null") || {
-  employees: [],
+  employees: [
+        { id: 'patron', name: 'patron', role: 'patron', password: 'patron123', photo: null, status: 'offline' }
+
+  ],
   catalogue: [],
   sales: [],
   sessions: [],
