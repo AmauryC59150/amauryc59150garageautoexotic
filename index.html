@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garage Auto Exotic</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="notif" id="notif"></div>
+
+    <div class="screen active" id="screen-login">
+        <div class="login-box">
+            <div class="garage-logo">
+                <img src="/img/logo.png" class="logo-img"
+                    onerror="this.style.display='none';document.getElementById('logo-icon').style.display='block';">
+                <span class="icon" id="logo-icon" style="display:none;"></span>
+                <h1>Auto Exotic</h1>
+                <p>Garage Management System</p>
+            </div>
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="switchLoginTab('employe')">Employé</button>
+                <button class="login-tab" onclick="switchLoginTab('patron','copatron')">Direction</button>
+            </div>
+            <div id="tab-employe">
+                <div class="form-group">
+                    <label>Sélectionner ton compte</label>
+                    <select id="emp-select" class="input-field" style="appearance:none;">
+                        <option value="">-- Choisir --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="emp-password" placeholder="••••••">
+                </div>
+                <button class="btn-primary" onclick="loginEmployee()">CONNEXION</button>
+            </div>
+            <div id="tab-patron" style="display:none;">
+                <div class="form-group">
+                    <label>Identifiant</label>
+                    <input type="text" id="boss-login">
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="boss-password" placeholder="••••••">
+                </div>
+                <button class="btn-primary" onclick="loginBoss()">CONNEXION</button>
+            </div>
+            <div class="error-msg" id="login-error">Identifiants incorrects</div>
+        </div>
+    </div>
+
+    <div class="screen" id="screen-app">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-text">🚗 AUTO EXOTIC</div>
+                <div class="user-info">
+                    <div class="user-avatar-mini-placeholder" id="sidebar-avatar">?</div>
+                    <div class="user-details">
+                        <div class="name" id="sidebar-name">—</div>
+                        <div class="role" id="sidebar-role">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="status-toggle-area">
+                <label>Mon statut</label>
+                <button class="status-btn online" onclick="setStatus('online')"><span class="status-dot"></span> En
+                    service</button>
+                <button class="status-btn offline" onclick="setStatus('offline')"><span class="status-dot"></span> Fin
+                    de service</button>
+                <div class="timer-display" id="timer-display">
+                    <div>
+                        <div class="timer-label">En service depuis</div>
+                        <div class="timer-clock" id="timer-clock">00:00:00</div>
+                    </div>
+                    <div style="font-size:20px;">⏱</div>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label">Navigation</div>
+                <div class="nav-item active" onclick="showPanel('dashboard')"><span
+                        class="icon">🏠</span><span>Dashboard</span></div>
+                <div class="nav-item" onclick="showPanel('equipe')"><span class="icon">👥</span><span>Équipe</span>
+                </div>
+                <div class="nav-item" onclick="showPanel('catalogue')"><span
+                        class="icon">📋</span><span>Catalogue</span></div>
+                <div class="nav-item" onclick="showPanel('historique')"><span
+                        class="icon">📊</span><span>Historique</span></div>
+                <div class="nav-item" onclick="showPanel('heures')"><span class="icon">⏱</span><span>Heures</span></div>
+                <div class="nav-item" id="nav-admin" style="display:none;" onclick="showPanel('admin')"><span
+                        class="icon">⚙️</span><span>Admin</span></div>
+                <div class="nav-item" onclick="showPanel('profil')"><span class="icon">👤</span><span>Mon Profil</span>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">⏻ Déconnexion</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+
+            <div class="tab-panel active" id="panel-dashboard">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Dashboard</div>
+                        <div class="page-subtitle">Vue d'ensemble du garage</div>
+                    </div>
+                    <div id="dashboard-date"
+                        style="font-family:'Share Tech Mono',monospace;color:var(--text-dim);font-size:13px;"></div>
+                </div>
+                <div class="stats-row" id="stats-row"></div>
+                <div class="card">
+                    <div class="card-title">🟢 Employés En Service</div>
+                    <div id="online-employees-list"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📊 Mes Ventes Récentes</div>
+                    <div id="my-recent-sales"></div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panel-equipe">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Équipe</div>
+                        <div class="page-subtitle">Tous les employés du garage</div>
+                    </div>
+                </div>
+                <div class="employees-grid" id="employees-grid"></div>
+            </div>
+
+            <div class="tab-panel" id="panel-catalogue">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Catalogue de Prix</div>
+                        <div class="page-subtitle">Tarifs</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🔧 Prestations & Tarifs</div>
+                    <div class="catalogue-grid" id="catalogue-grid"></div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panel-historique">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Historique des Ventes</div>
+                        <div class="page-subtitle" id="historique-subtitle">Mes opérations</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div id="historique-totals" style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:16px;"></div>
+                    <div style="overflow-x:auto;">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th id="hist-col-emp" style="display:none;">Employé</th>
+                                    <th id="hist-col-grade" style="display:none;">Grade</th>
+                                    <th>Prestation</th>
+                                    <th>Qté</th>
+                                    <th>Facture</th>
+                                    <th>% Com.</th>
+                                    <th>Salaire</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historique-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panel-profil">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Mon Profil</div>
+                        <div class="page-subtitle">Gérer mon compte</div>
+                    </div>
+                </div>
+                <div class="grade-info-box">
+                    <div>
+                        <div class="timer-label" style="margin-bottom:4px;">Mon Grade</div>
+                        <div class="grade-badge" id="my-grade-badge">—</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="grade-pct-label">Ma Commission</div>
+                        <div class="grade-pct" id="my-grade-pct">—%</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📷 Photo de Profil</div>
+                    <div class="photo-upload-area" onclick="document.getElementById('profile-photo-input').click()">
+                        <input type="file" id="profile-photo-input" accept="image/*"
+                            onchange="handleProfilePhoto(event)">
+                        <img class="photo-preview" id="profile-photo-preview">
+                        <div id="photo-upload-text">
+                            <div style="font-size:36px;margin-bottom:8px;">📷</div>
+                            <div style="font-size:14px;color:var(--text-dim);">Cliquer pour changer la photo</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">➕ Enregistrer une Vente</div>
+                    <div class="form-row three">
+                        <div>
+                            <label class="input-label">Description</label>
+                            <input type="text" class="input-field" id="sale-custom-name" placeholder="Custom tuning...">
+                        </div>
+                        <div>
+                            <label class="input-label">Prix Custom ($)</label>
+                            <input type="number" class="input-field" id="sale-custom-price" placeholder="45000" min="0"
+                                oninput="updateSalePreview()">
+                        </div>
+                        <div>
+                            <label class="input-label">Quantité</label>
+                            <input type="number" class="input-field" id="sale-custom-qty" value="1" min="1"
+                                oninput="updateSalePreview()">
+                        </div>
+                    </div>
+                    <div id="sale-preview" style="display:none;margin-bottom:16px;">
+                        <div style="background:var(--dark3);padding:14px;border:1px solid var(--border);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span
+                                    style="color:var(--text-dim);font-size:13px;font-family:'Share Tech Mono',monospace;">FACTURE</span>
+                                <span id="preview-total"
+                                    style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--green);">$0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+                                <span id="preview-pct-label"
+                                    style="color:var(--text-dim);font-size:13px;font-family:'Share Tech Mono',monospace;">MON
+                                    SALAIRE (—%)</span>
+                                <span id="preview-salary"
+                                    style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--yellow);">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-action success" onclick="addSale()">✓ VALIDER LA VENTE</button>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panel-heures">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Heures de Service</div>
+                        <div class="page-subtitle" id="heures-subtitle">Mes sessions</div>
+                    </div>
+                </div>
+                <div class="stats-row" id="heures-stats-row"></div>
+                <div class="card" id="current-session-card" style="display:none;">
+                    <div class="card-title" style="color:var(--green);">🟢 Session en Cours</div>
+                    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+                        <div>
+                            <div class="timer-label" style="margin-bottom:4px;">Début</div>
+                            <div id="current-session-start"
+                                style="font-family:'Share Tech Mono',monospace;font-size:15px;"></div>
+                        </div>
+                        <div>
+                            <div class="timer-label" style="margin-bottom:4px;">Durée</div>
+                            <div id="current-session-live"
+                                style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--green);letter-spacing:2px;">
+                                00:00:00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📋 Historique des Sessions</div>
+                    <div id="heures-filter-row" style="display:none;margin-bottom:16px;">
+                        <label class="input-label">Filtrer par employé</label>
+                        <select class="input-field" id="heures-emp-filter" onchange="renderHeures()"
+                            style="max-width:260px;appearance:none;">
+                            <option value="">Tous</option>
+                        </select>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="hours-table">
+                            <thead>
+                                <tr>
+                                    <th id="hcol-emp" style="display:none;">Employé</th>
+                                    <th>Date</th>
+                                    <th>Prise de service</th>
+                                    <th>Fin de service</th>
+                                    <th>Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody id="heures-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN -->
+            <div class="tab-panel" id="panel-admin">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Administration</div>
+                        <div class="page-subtitle">Gestion complète du garage</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🏅 Grades & Pourcentages de Commission</div>
+                    <p
+                        style="color:var(--text-dim);font-size:13px;font-family:'Share Tech Mono',monospace;margin-bottom:16px;">
+                        Modifie le % de commission pour chaque grade.</p>
+                    <table class="grade-settings-table">
+                        <thead>
+                            <tr>
+                                <th>Grade</th>
+                                <th>% Commission</th>
+                                <th>Aperçu (base 10 000$)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grade-settings-body"></tbody>
+                    </table>
+                    <div style="margin-top:16px;">
+                        <button class="btn-action primary" onclick="saveGradeSettings()">💾 SAUVEGARDER LES %</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">➕ Ajouter un Employé</div>
+                    <div class="form-row three">
+                        <div><label class="input-label">Nom Complet</label><input type="text" class="input-field"
+                                id="new-emp-name" placeholder="John Doe"></div>
+                        <div>
+                            <label class="input-label">Grade</label>
+                            <select class="input-field" id="new-emp-role">
+                                <option value="patron">Patron</option>
+                                <option value="copatron">Co-Patron</option>
+                                <option value="chefdequipe">Chef d'Équipe</option>
+                                <option value="experimente">Expérimenté</option>
+                                <option value="novice">Novice</option>
+                                <option value="recrue">Recrue</option>
+                                <option value="stagiaire">Stagiaire</option>
+                            </select>
+                        </div>
+                        <div><label class="input-label">Mot de Passe</label><input type="text" class="input-field"
+                                id="new-emp-password" placeholder="password123"></div>
+                    </div>
+                    <div class="photo-upload-area" style="max-width:300px;margin-bottom:16px;"
+                        onclick="document.getElementById('new-emp-photo-input').click()">
+                        <input type="file" id="new-emp-photo-input" accept="image/*"
+                            onchange="handleNewEmpPhoto(event)">
+                        <img class="photo-preview" id="new-emp-photo-preview">
+                        <div id="new-emp-photo-text">
+                            <div style="font-size:28px;margin-bottom:6px;">📷</div>
+                            <div style="font-size:13px;color:var(--text-dim);">Photo (optionnel)</div>
+                        </div>
+                    </div>
+                    <button class="btn-action success" onclick="addEmployee()">AJOUTER L'EMPLOYÉ</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📋 Gérer le Catalogue</div>
+                    <div id="admin-catalogue-list"></div>
+                    <hr class="divider">
+                    <div class="form-row">
+                        <div><label class="input-label">Nom de la Prestation</label><input type="text"
+                                class="input-field" id="new-cat-name" placeholder="Réparation moteur"></div>
+                        <div><label class="input-label">Prix ($)</label><input type="number" class="input-field"
+                                id="new-cat-price" placeholder="5000"></div>
+                    </div>
+                    <button class="btn-action primary" onclick="addCatalogueItem()">+ AJOUTER AU CATALOGUE</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">💸 Dépenses du Garage</div>
+                    <div id="depenses-list" style="margin-bottom:16px;"></div>
+                    <hr class="divider">
+                    <div class="form-row three">
+                        <div><label class="input-label">Description</label><input type="text" class="input-field"
+                                id="new-dep-name" placeholder="Achat pièces, loyer..."></div>
+                        <div><label class="input-label">Montant ($)</label><input type="number" class="input-field"
+                                id="new-dep-amount" placeholder="5000" min="0"></div>
+                        <div>
+                            <label class="input-label">Catégorie</label>
+                            <select class="input-field" id="new-dep-cat" style="appearance:none;">
+                                <option value="pieces">🔩 Pièces / Stock</option>
+                                <option value="salaire">💰 Salaires</option>
+                                <option value="autre">📦 Autre</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-action danger" onclick="addDepense()">+ ENREGISTRER LA DÉPENSE</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">👥 Gérer les Employés</div>
+                    <div id="admin-emp-list"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📊 Bilan Global</div>
+                    <div id="admin-global-stats" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;"></div>
+                    <div id="admin-bilan-net"
+                        style="padding:16px;border:1px solid var(--border);background:var(--dark3);margin-bottom:20px;">
+                    </div>
+                    <hr class="divider">
+                    <div
+                        style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--red);margin-bottom:12px;">
+                        ⚠️ Zone Danger</div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                        <button class="btn-action danger" onclick="resetSales()">🗑 Reset Ventes</button>
+                        <button class="btn-action danger" onclick="resetSessions()">🗑 Reset Heures</button>
+                        <button class="btn-action danger" onclick="resetDepenses()">🗑 Reset Dépenses</button>
+                        <button class="btn-action danger" style="border-color:#4285f4;color:#4285f4;"
+                            onclick="resetAll()">💥 TOUT RESET</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-edit-emp">
+        <div class="modal">
+            <div class="modal-title">Modifier Employé</div>
+            <button class="modal-close" onclick="closeModal('modal-edit-emp')">✕</button>
+            <input type="hidden" id="edit-emp-id">
+            <label class="input-label">Nom</label>
+            <input type="text" class="input-field" id="edit-emp-name" style="margin-bottom:12px;">
+            <label class="input-label">Grade</label>
+            <select class="input-field" id="edit-emp-role" style="margin-bottom:16px;appearance:none;">
+                <option value="patron">Patron</option>
+                <option value="copatron">Co-Patron</option>
+                <option value="chefdequipe">Chef d'Équipe</option>
+                <option value="experimente">Expérimenté</option>
+                <option value="novice">Novice</option>
+                <option value="recrue">Recrue</option>
+                <option value="stagiaire">Stagiaire</option>
+            </select>
+            <label class="input-label">Nouveau Mot de Passe</label>
+            <input type="text" class="input-field" id="edit-emp-password" style="margin-bottom:16px;"
+                placeholder="••••••">
+            <div style="display:flex;gap:10px;">
+                <button class="btn-action primary" onclick="saveEditEmployee()">SAUVEGARDER</button>
+                <button class="btn-action" onclick="closeModal('modal-edit-emp')"
+                    style="border-color:var(--border);color:var(--text-dim);">ANNULER</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
